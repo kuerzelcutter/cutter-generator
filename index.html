@@ -52,7 +52,7 @@
   <script src="js/bootstrap.bundle.min.js"></script>
   <script>
     let cutterList = [];
-    const jsonUrl = "cutter.json"; // Oder nutze den Raw-Link, falls nötig
+    const jsonUrl = "cutter.json"; // Datei liegt im gleichen Ordner wie index.html
 
     fetch(jsonUrl)
       .then(response => {
@@ -67,6 +67,7 @@
       .catch(err => {
         document.getElementById("status").textContent = "Fehler beim Laden der JSON-Datei: " + err;
         cutterList = [];
+        console.error(err);
       });
 
     document.getElementById("namesInput").addEventListener("keydown", function (event) {
@@ -187,12 +188,4 @@
       document.getElementById("copyStatus").textContent = "";
     }
 
-    document.addEventListener("keydown", function (event) {
-      if (event.ctrlKey && event.key === "Backspace") {
-        event.preventDefault();
-        document.getElementById("clearBtn").click();
-      }
-    });
-  </script>
-</body>
-</html>
+    document.addEventListener
