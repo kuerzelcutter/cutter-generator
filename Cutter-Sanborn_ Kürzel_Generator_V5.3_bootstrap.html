@@ -21,10 +21,6 @@
         <h2 class="mb-4 text-primary">Cutter-Sanborn Kürzel Generator</h2>
         <form class="mb-3">
           <div class="mb-2">
-            <label for="fileInput" class="form-label">JSON-Datei auswählen:</label>
-            <input type="file" class="form-control form-control-sm smaller-input" id="fileInput" accept=".json" />
-          </div>
-          <div class="mb-2">
             <label for="namesInput" class="form-label">
               Namen (jeweils einer pro Zeile, z.B. "Göpffarth Dirk", "Deutschland" oder "!Hans"):
             </label>
@@ -35,7 +31,7 @@
             <button type="button" class="btn btn-outline-secondary btn-sm" id="clearBtn" onclick="clearAll()">Alles löschen</button>
           </div>
         </form>
-        <div class="status-message mb-2 text-info" id="status"></div>
+        <div class="status-message mb-2 text-info" id="status">Cutter-Liste wird geladen...</div>
         <div class="row g-4">
           <div class="col-lg-7 col-md-12">
             <div id="results"></div>
@@ -57,22 +53,24 @@
   <script>
     let cutterList = [];
 
-    document.getElementById("fileInput").addEventListener("change", function (event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          cutterList = JSON.parse(e.target.result);
-          document.getElementById("status").textContent =
-            "Datei erfolgreich geladen (" + cutterList.length + " Einträge).";
-        } catch (err) {
-          document.getElementById("status").textContent = "Fehler beim Parsen der JSON-Datei!";
-          cutterList = [];
-        }
-      };
-      reader.readAsText(file, "UTF-8");
-    });
+    // HIER den Link zu deiner JSON-Datei eintragen (GitHub raw-Link oder anderer öffentlicher Direktlink)
+    const jsonUrl = "https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/71102287/879624b6-ba58-4c31-ad2e-5498ed3c3592/paste.txt";
+
+    // JSON-Datei laden
+    fetch(jsonUrl)
+      .then(response => {
+        if (!response.ok) throw new Error("Netzwerkfehler");
+        return response.json();
+      })
+      .then(data => {
+        cutterList = data;
+        document.getElementById("status").textContent =
+          "Cutter-Liste erfolgreich geladen (" + cutterList.length + " Einträge).";
+      })
+      .catch(err => {
+        document.getElementById("status").textContent = "Fehler beim Laden der JSON-Datei!";
+        cutterList = [];
+      });
 
     document.getElementById("namesInput").addEventListener("keydown", function (event) {
       if (event.key === "Enter" && (event.ctrlKey || event.altKey)) {
@@ -103,7 +101,7 @@
       if (!input) return;
       if (!cutterList.length) {
         outputDiv.innerHTML =
-          '<div class="alert alert-warning">Bitte zuerst eine gültige JSON-Datei laden!</div>';
+          '<div class="alert alert-warning">Cutter-Liste nicht geladen!</div>';
         return;
       }
 
