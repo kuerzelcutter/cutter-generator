@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cutter-Sanborn Kürzel Generator (Mehrfach-Eingabe & Kopieren)</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <style>
+    body { margin-top: 2em; }
+    #cutterCopyBlock { min-width: 260px; }
+    #cutterListArea { height: 200px; }
+    .table-responsive { margin-top: 1em; }
+    .status-message { min-height: 2em; }
+    .form-label { font-size: 0.97rem; }
+    .smaller-input { max-width: 350px; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <h2 class="mb-4 text-primary">Cutter-Sanborn Kürzel Generator</h2>
+        <form class="mb-3">
+          <div class="mb-2">
+            <label for="fileInput" class="form-label">JSON-Datei auswählen:</label>
+            <input type="file" class="form-control form-control-sm smaller-input" id="fileInput" accept=".json" />
+          </div>
+          <div class="mb-2">
+            <label for="namesInput" class="form-label">
+              Namen (jeweils einer pro Zeile, z.B. "Göpffarth Dirk", "Deutschland" oder "!Hans"):
+            </label>
+            <textarea class="form-control form-control-sm smaller-input" id="namesInput" rows="4" placeholder="Jeder Name in eine neue Zeile"></textarea>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-success btn-sm me-2" onclick="generateCutterList()">Kürzel generieren</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearBtn" onclick="clearAll()">Alles löschen</button>
+          </div>
+        </form>
+        <div class="status-message mb-2 text-info" id="status"></div>
+        <div class="row g-4">
+          <div class="col-lg-7 col-md-12">
+            <div id="results"></div>
+          </div>
+          <div class="col-lg-5 col-md-12">
+            <div id="cutterCopyBlock" style="display:none;">
+              <label for="cutterListArea" class="form-label fw-bold">Alle Cutter-Kürzel (zum Kopieren oder Ausschneiden):</label>
+              <textarea class="form-control mb-2" id="cutterListArea"></textarea>
+              <button type="button" class="btn btn-primary btn-sm mb-2" id="copyBtn" onclick="copyCutterList()">Alle Cutter-Kürzel kopieren</button>
+              <span id="copyStatus" class="text-success"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-none d-lg-block col-lg-6"></div>
+    </div>
+  </div>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script>
+    let cutterList = [];
+
+    document.getElementById("fileInput").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          cutterList = JSON.parse(e.target.result);
+          document.getElementById("status").textContent =
+            "Datei erfolgreich geladen (" + cutterList.length + " Einträge).";
+        } catch (err) {
+          document.getElementById("status").textContent = "Fehler beim Parsen der JSON-Datei!";
+          cutterList = [];
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    });
+
+    document.getElementById("namesInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && (event.ctrlKey || event.altKey)) {
+        event.preventDefault();
+        generateCutterList();
+      }
+    });
+
+    function replaceUmlauts(text) {
+      return text
+        .replace(/ä/g, "ae")
+        .replace(/ö/g, "oe")
+        .replace(/ü/g, "ue")
+        .replace(/ß/g, "ss")
+        .replace(/Ä/g, "Ae")
+        .replace(/Ö/g, "Oe")
+        .replace(/Ü/g, "Ue");
+    }
+
+    function generateCutterList() {
+      const input = document.getElementById("namesInput").value.trim();
+      const outputDiv = document.getElementById("results");
+      const cutterArea = document.getElementById("cutterListArea");
+      const copyBlock = document.getElementById("cutterCopyBlock");
+      outputDiv.innerHTML = "";
+      cutterArea.value = "";
+      copyBlock.style.display = "none";
+      if (!input) return;
+      if (!cutterList.length) {
+        outputDiv.innerHTML =
+          '<div class="alert alert-warning">Bitte zuerst eine gültige JSON-Datei laden!</div>';
+        return;
+      }
+
+      const lines = input
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+      let resultRows = [];
+      let cutterErgebnisse = [];
+      for (const line of lines) {
+        const cleanLine = line.replace(/^!+/, "").trim();
+        const parts = cleanLine.split(/\s+/);
+        const nachname = parts[0];
+        const vorname = parts.length > 1 ? parts.slice(1).join(" ") : "";
+        // Erst Umlaute ersetzen, dann Sonderzeichen entfernen!
+        const nachnameClean = replaceUmlauts(nachname).replace(/[^a-zA-Z]/g, "").toLowerCase();
+        const vornameInit = vorname ? replaceUmlauts(vorname).toLowerCase().charAt(0) : "";
+        const suchbegriff = vornameInit ? nachnameClean + "," + vornameInit + "." : nachnameClean;
+
+        let found = cutterList.find((entry) => entry.kuerzel === suchbegriff);
+        let cutterErgebnis = "";
+        if (found) {
+          cutterErgebnis = nachnameClean.charAt(0).toUpperCase() + found.nummer;
+        } else {
+          let maxEntry = null;
+          for (let entry of cutterList) {
+            if (entry.kuerzel && entry.kuerzel <= suchbegriff) {
+              if (!maxEntry || entry.kuerzel > maxEntry.kuerzel) {
+                maxEntry = entry;
+              }
+            }
+          }
+          if (maxEntry) {
+            cutterErgebnis = nachnameClean.charAt(0).toUpperCase() + maxEntry.nummer;
+          } else {
+            cutterErgebnis = "Kein Kürzel gefunden!";
+          }
+        }
+        resultRows.push(`<tr><td>${line}</td><td>${cutterErgebnis}</td></tr>`);
+        cutterErgebnisse.push(cutterErgebnis);
+      }
+      outputDiv.innerHTML = `
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Cutter-Kürzel</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${resultRows.join("")}
+            </tbody>
+          </table>
+        </div>`;
+
+      cutterArea.value = cutterErgebnisse.join("\n");
+      copyBlock.style.display = "block";
+      document.getElementById("copyStatus").textContent = "";
+    }
+
+    document.getElementById("cutterListArea").addEventListener("cut", function (e) {
+      setTimeout(() => {
+        const cutterArea = document.getElementById("cutterListArea");
+        const remaining = cutterArea.value.split("\n").filter((line) => line.trim() !== "");
+        cutterArea.value = remaining.join("\n");
+      }, 0);
+    });
+
+    function copyCutterList() {
+      const cutterArea = document.getElementById("cutterListArea");
+      cutterArea.select();
+      cutterArea.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      document.getElementById("copyStatus").textContent = "Kopiert!";
+      setTimeout(() => {
+        document.getElementById("copyStatus").textContent = "";
+      }, 1200);
+    }
+
+    function clearAll() {
+      document.getElementById("namesInput").value = "";
+      document.getElementById("results").innerHTML = "";
+      document.getElementById("cutterListArea").value = "";
+      document.getElementById("cutterCopyBlock").style.display = "none";
+      document.getElementById("copyStatus").textContent = "";
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.ctrlKey && event.key === "Backspace") {
+        event.preventDefault();
+        document.getElementById("clearBtn").click();
+      }
+    });
+  </script>
+</body>
+</html>
