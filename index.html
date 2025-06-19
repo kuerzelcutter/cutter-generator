@@ -56,7 +56,7 @@
 
     fetch(jsonUrl)
       .then(response => {
-        if (!response.ok) throw new Error("Netzwerkfehler: " + response.status);
+        if (!response.ok) throw new Error("Netzwerkfehler: " + response.status + " " + response.statusText);
         return response.json();
       })
       .then(data => {
@@ -182,10 +182,4 @@
 
     function clearAll() {
       document.getElementById("namesInput").value = "";
-      document.getElementById("results").innerHTML = "";
-      document.getElementById("cutterListArea").value = "";
-      document.getElementById("cutterCopyBlock").style.display = "none";
-      document.getElementById("copyStatus").textContent = "";
-    }
-
-    document.addEventListener
+      document
