@@ -182,4 +182,18 @@
 
     function clearAll() {
       document.getElementById("namesInput").value = "";
-      document
+      document.getElementById("results").innerHTML = "";
+      document.getElementById("cutterListArea").value = "";
+      document.getElementById("cutterCopyBlock").style.display = "none";
+      document.getElementById("copyStatus").textContent = "";
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.ctrlKey && event.key === "Backspace") {
+        event.preventDefault();
+        document.getElementById("clearBtn").click();
+      }
+    });
+  </script>
+</body>
+</html>
