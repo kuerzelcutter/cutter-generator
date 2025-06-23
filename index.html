@@ -88,6 +88,11 @@
         .replace(/Ü/g, "Ue");
     }
 
+    // NEU: Diakritische Zeichen entfernen
+    function removeDiacritics(str) {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     function generateCutterList() {
       const input = document.getElementById("namesInput").value.trim();
       const outputDiv = document.getElementById("results");
@@ -114,9 +119,9 @@
         const parts = cleanLine.split(/\s+/);
         const nachname = parts[0];
         const vorname = parts.length > 1 ? parts.slice(1).join(" ") : "";
-        // Erst Umlaute ersetzen, dann Sonderzeichen entfernen!
-        const nachnameClean = replaceUmlauts(nachname).replace(/[^a-zA-Z]/g, "").toLowerCase();
-        const vornameInit = vorname ? replaceUmlauts(vorname).toLowerCase().charAt(0) : "";
+        // Erst Umlaute und Diakritika ersetzen, dann Sonderzeichen entfernen!
+        const nachnameClean = removeDiacritics(replaceUmlauts(nachname)).replace(/[^a-zA-Z]/g, "").toLowerCase();
+        const vornameInit = vorname ? removeDiacritics(replaceUmlauts(vorname)).toLowerCase().charAt(0) : "";
         const suchbegriff = vornameInit ? nachnameClean + "," + vornameInit + "." : nachnameClean;
 
         let found = cutterList.find((entry) => entry.kuerzel === suchbegriff);
