@@ -1,0 +1,1 @@
+The Cutter-Sanborn Kürzel Generator V5 is designed to efficiently handle multiple entries at once and supports convenient shortcuts for copying results. Its goal is to streamline workflows and make your work more efficient.
