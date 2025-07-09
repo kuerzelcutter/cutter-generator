@@ -12,6 +12,14 @@
     .status-message { min-height: 2em; }
     .form-label { font-size: 0.97rem; }
     .smaller-input { max-width: 350px; }
+
+    /* Kleinere, kompakte Alert-Box */
+    .small-alert {
+      font-size: 0.85rem;       /* kleinere Schrift */
+      padding: 0.25rem 0.5rem;  /* kompakteres Padding */
+      margin-bottom: 0.5rem;    /* kleinerer Abstand */
+      max-width: 360px;         /* begrenzte Breite */
+    }
   </style>
 </head>
 <body>
@@ -19,10 +27,15 @@
     <div class="row">
       <div class="col-12 col-md-8 col-lg-6">
         <h2 class="mb-4 text-primary">Cutter-Sanborn Kürzel Generator</h2>
+        <!-- HINWEIS-BOX START -->
+        <div class="alert alert-info small-alert">
+          <strong>STRG+Enter</strong> im Namensfeld: Kürzel werden generiert.<br>
+          <strong>STRG+Backspace</strong>: alles wird zurückgesetzt.
+        </div>
+        <!-- HINWEIS-BOX ENDE -->
         <form class="mb-3">
           <div class="mb-2">
             <label for="namesInput" class="form-label">
-              Namen (jeweils einer pro Zeile, z.B. "Göpffarth Dirk", "Deutschland" oder "!Hans"):
             </label>
             <textarea class="form-control form-control-sm smaller-input" id="namesInput" rows="4" placeholder="Jeder Name in eine neue Zeile"></textarea>
           </div>
@@ -51,154 +64,6 @@
   </div>
   <script src="js/bootstrap.bundle.min.js"></script>
   <script>
-    let cutterList = [];
-    const jsonUrl = "cutter.json"; // Datei liegt im gleichen Ordner wie index.html
-
-    fetch(jsonUrl)
-      .then(response => {
-        if (!response.ok) throw new Error("Netzwerkfehler: " + response.status + " " + response.statusText);
-        return response.json();
-      })
-      .then(data => {
-        cutterList = data;
-        document.getElementById("status").textContent =
-          "Cutter-Liste erfolgreich geladen (" + cutterList.length + " Einträge).";
-      })
-      .catch(err => {
-        document.getElementById("status").textContent = "Fehler beim Laden der JSON-Datei: " + err;
-        cutterList = [];
-        console.error(err);
-      });
-
-    document.getElementById("namesInput").addEventListener("keydown", function (event) {
-      if (event.key === "Enter" && (event.ctrlKey || event.altKey)) {
-        event.preventDefault();
-        generateCutterList();
-      }
-    });
-
-    function replaceUmlauts(text) {
-      return text
-        .replace(/ä/g, "ae")
-        .replace(/ö/g, "oe")
-        .replace(/ü/g, "ue")
-        .replace(/ß/g, "ss")
-        .replace(/Ä/g, "Ae")
-        .replace(/Ö/g, "Oe")
-        .replace(/Ü/g, "Ue");
-    }
-
-    // NEU: Diakritische Zeichen entfernen
-    function removeDiacritics(str) {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-
-    function generateCutterList() {
-      const input = document.getElementById("namesInput").value.trim();
-      const outputDiv = document.getElementById("results");
-      const cutterArea = document.getElementById("cutterListArea");
-      const copyBlock = document.getElementById("cutterCopyBlock");
-      outputDiv.innerHTML = "";
-      cutterArea.value = "";
-      copyBlock.style.display = "none";
-      if (!input) return;
-      if (!cutterList.length) {
-        outputDiv.innerHTML =
-          '<div class="alert alert-warning">Cutter-Liste nicht geladen!</div>';
-        return;
-      }
-
-      const lines = input
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
-      let resultRows = [];
-      let cutterErgebnisse = [];
-      for (const line of lines) {
-        const cleanLine = line.replace(/^!+/, "").trim();
-        const parts = cleanLine.split(/\s+/);
-        const nachname = parts[0];
-        const vorname = parts.length > 1 ? parts.slice(1).join(" ") : "";
-        // Erst Umlaute und Diakritika ersetzen, dann Sonderzeichen entfernen!
-        const nachnameClean = removeDiacritics(replaceUmlauts(nachname)).replace(/[^a-zA-Z]/g, "").toLowerCase();
-        const vornameInit = vorname ? removeDiacritics(replaceUmlauts(vorname)).toLowerCase().charAt(0) : "";
-        const suchbegriff = vornameInit ? nachnameClean + "," + vornameInit + "." : nachnameClean;
-
-        let found = cutterList.find((entry) => entry.kuerzel === suchbegriff);
-        let cutterErgebnis = "";
-        if (found) {
-          cutterErgebnis = nachnameClean.charAt(0).toUpperCase() + found.nummer;
-        } else {
-          let maxEntry = null;
-          for (let entry of cutterList) {
-            if (entry.kuerzel && entry.kuerzel <= suchbegriff) {
-              if (!maxEntry || entry.kuerzel > maxEntry.kuerzel) {
-                maxEntry = entry;
-              }
-            }
-          }
-          if (maxEntry) {
-            cutterErgebnis = nachnameClean.charAt(0).toUpperCase() + maxEntry.nummer;
-          } else {
-            cutterErgebnis = "Kein Kürzel gefunden!";
-          }
-        }
-        resultRows.push(`<tr><td>${line}</td><td>${cutterErgebnis}</td></tr>`);
-        cutterErgebnisse.push(cutterErgebnis);
-      }
-      outputDiv.innerHTML = `
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Cutter-Kürzel</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${resultRows.join("")}
-            </tbody>
-          </table>
-        </div>`;
-
-      cutterArea.value = cutterErgebnisse.join("\n");
-      copyBlock.style.display = "block";
-      document.getElementById("copyStatus").textContent = "";
-    }
-
-    document.getElementById("cutterListArea").addEventListener("cut", function (e) {
-      setTimeout(() => {
-        const cutterArea = document.getElementById("cutterListArea");
-        const remaining = cutterArea.value.split("\n").filter((line) => line.trim() !== "");
-        cutterArea.value = remaining.join("\n");
-      }, 0);
-    });
-
-    function copyCutterList() {
-      const cutterArea = document.getElementById("cutterListArea");
-      cutterArea.select();
-      cutterArea.setSelectionRange(0, 99999);
-      document.execCommand("copy");
-      document.getElementById("copyStatus").textContent = "Kopiert!";
-      setTimeout(() => {
-        document.getElementById("copyStatus").textContent = "";
-      }, 1200);
-    }
-
-    function clearAll() {
-      document.getElementById("namesInput").value = "";
-      document.getElementById("results").innerHTML = "";
-      document.getElementById("cutterListArea").value = "";
-      document.getElementById("cutterCopyBlock").style.display = "none";
-      document.getElementById("copyStatus").textContent = "";
-    }
-
-    document.addEventListener("keydown", function (event) {
-      if (event.ctrlKey && event.key === "Backspace") {
-        event.preventDefault();
-        document.getElementById("clearBtn").click();
-      }
-    });
   </script>
 </body>
 </html>
