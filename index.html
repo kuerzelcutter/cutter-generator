@@ -9,7 +9,6 @@
     #cutterCopyBlock { min-width: 260px; }
     #cutterListArea { height: 200px; }
     .table-responsive { margin-top: 1em; }
-    .status-message { min-height: 2em; }
     .form-label { font-size: 0.97rem; }
     .smaller-input { max-width: 350px; }
     .small-alert {
@@ -18,6 +17,7 @@
       margin-bottom: 0.5rem;
       max-width: 360px;
     }
+    /* .status-message entfernt */
   </style>
 </head>
 <body>
@@ -39,7 +39,7 @@
             <button type="button" class="btn btn-outline-secondary btn-sm" id="clearBtn" onclick="clearAll()">Alles löschen</button>
           </div>
         </form>
-        <div class="status-message mb-2 text-info" id="status">Cutter-Liste wird geladen...</div>
+        <!-- Statusmeldung entfernt -->
         <div class="row g-4">
           <div class="col-lg-7 col-md-12">
             <div id="results"></div>
@@ -69,13 +69,12 @@
       })
       .then(data => {
         cutterList = data;
-        document.getElementById("status").textContent =
-          "Cutter-Liste erfolgreich geladen (" + cutterList.length + " Einträge).";
+        // Statusmeldung entfernt
       })
       .catch(err => {
-        document.getElementById("status").textContent = "Fehler beim Laden der JSON-Datei: " + err;
         cutterList = [];
         console.error(err);
+        // Statusmeldung entfernt
       });
 
     document.getElementById("namesInput").addEventListener("keydown", function (event) {
