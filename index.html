@@ -84,16 +84,19 @@
       }
     });
 
-    function replaceUmlauts(text) {
-      return text
-        .replace(/ä/g, "ae")
-        .replace(/ö/g, "oe")
-        .replace(/ü/g, "ue")
-        .replace(/ß/g, "ss")
-        .replace(/Ä/g, "Ae")
-        .replace(/Ö/g, "Oe")
-        .replace(/Ü/g, "Ue");
-    }
+   function replaceUmlauts(text) {
+  return text
+    .replace(/ħ/g, "h")
+    .replace(/Ħ/g, "H") 
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .replace(/Ä/g, "Ae")
+    .replace(/Ö/g, "Oe")
+    .replace(/Ü/g, "Ue");
+}
+
 
     function removeDiacritics(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -207,3 +210,4 @@
   </script>
 </body>
 </html>
+
