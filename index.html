@@ -84,101 +84,18 @@
       }
     });
 
-function replaceSpecialChars(text) {
+   function replaceUmlauts(text) {
   return text
-    // Deutsche Umlaute
+    .replace(/ħ/g, "h")
+    .replace(/Ħ/g, "H") 
     .replace(/ä/g, "ae")
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
     .replace(/Ä/g, "Ae")
     .replace(/Ö/g, "Oe")
-    .replace(/Ü/g, "Ue")
-
-    // Skandinavische Umlaute/Sonderzeichen
-    .replace(/ø/g, "o")
-    .replace(/Ø/g, "O")
-    .replace(/å/g, "aa")
-    .replace(/Å/g, "Aa")
-    .replace(/æ/g, "ae")
-    .replace(/Æ/g, "Ae")
-
-    // Griechische Buchstaben (umgewandelt in Latein)
-    .replace(/Α|α/g, "a") // Alpha
-    .replace(/Β|β/g, "b") // Beta
-    .replace(/Γ|γ/g, "g") // Gamma
-    .replace(/Δ|δ/g, "d") // Delta
-    .replace(/Ε|ε/g, "e") // Epsilon
-    .replace(/Ζ|ζ/g, "z") // Zeta
-    .replace(/Η|η/g, "e") // Eta (ähnlich e)
-    .replace(/Θ|θ/g, "th") // Theta
-    .replace(/Ι|ι/g, "i") // Iota
-    .replace(/Κ|κ/g, "k") // Kappa
-    .replace(/Λ|λ/g, "l") // Lambda
-    .replace(/Μ|μ/g, "m") // My
-    .replace(/Ν|ν/g, "n") // Ny
-    .replace(/Ξ|ξ/g, "x") // Xi
-    .replace(/Ο|ο/g, "o") // Omikron
-    .replace(/Π|π/g, "p") // Pi
-    .replace(/Ρ|ρ/g, "r") // Rho
-    .replace(/Σ|σ|ς/g, "s") // Sigma
-    .replace(/Τ|τ/g, "t") // Tau
-    .replace(/Υ|υ/g, "y") // Ypsilon
-    .replace(/Φ|φ/g, "f") // Phi
-    .replace(/Χ|χ/g, "ch") // Chi
-    .replace(/Ψ|ψ/g, "ps") // Psi
-    .replace(/Ω|ω/g, "o") // Omega
-
-    // Bulgarisch/Kyrillische Basisbuchstaben (vereinfacht)
-    .replace(/[Аа]/g, "a")
-    .replace(/[Бб]/g, "b")
-    .replace(/[Вв]/g, "v")
-    .replace(/[Гг]/g, "g")
-    .replace(/[Дд]/g, "d")
-    .replace(/[Ее]/g, "e")
-    .replace(/[Жж]/g, "zh")
-    .replace(/[Зз]/g, "z")
-    .replace(/[Ии]/g, "i")
-    .replace(/[Йй]/g, "y")
-    .replace(/[Кк]/g, "k")
-    .replace(/[Лл]/g, "l")
-    .replace(/[Мм]/g, "m")
-    .replace(/[Нн]/g, "n")
-    .replace(/[Оо]/g, "o")
-    .replace(/[Пп]/g, "p")
-    .replace(/[Рр]/g, "r")
-    .replace(/[Сс]/g, "s")
-    .replace(/[Тт]/g, "t")
-    .replace(/[Уу]/g, "u")
-    .replace(/[Фф]/g, "f")
-    .replace(/[Хх]/g, "h")
-    .replace(/[Цц]/g, "ts")
-    .replace(/[Чч]/g, "ch")
-    .replace(/[Шш]/g, "sh")
-    .replace(/[Щщ]/g, "sht")
-    .replace(/[Ъъ]/g, "a")
-    .replace(/[Ьь]/g, "")
-    .replace(/[Юю]/g, "yu")
-    .replace(/[Яя]/g, "ya")
-
-    // Rumänische Buchstaben
-    .replace(/Ă|ă/g, "a")
-    .replace(/Â|â/g, "a")
-    .replace(/Î|î/g, "i")
-    .replace(/Ș|ș/g, "s")
-    .replace(/Ț|ț/g, "t")
-
-    // Türkische Buchstaben
-    .replace(/Ç|ç/g, "c")
-    .replace(/Ğ|ğ/g, "g")
-    .replace(/İ|ı/g, "i")
-    .replace(/Ş|ş/g, "s")
-    .replace(/Ü|ü/g, "ue")
-    .replace(/Ö|ö/g, "oe");
-
+    .replace(/Ü/g, "Ue");
 }
-
-
 
 
     function removeDiacritics(str) {
@@ -293,5 +210,4 @@ function replaceSpecialChars(text) {
   </script>
 </body>
 </html>
-
 
