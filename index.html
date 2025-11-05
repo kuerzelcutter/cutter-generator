@@ -84,17 +84,24 @@
       }
     });
 
-   function replaceUmlauts(text) {
+function replaceUmlauts(text) {
   return text
     .replace(/ħ/g, "h")
-    .replace(/Ħ/g, "H") 
+    .replace(/Ħ/g, "H")
     .replace(/ä/g, "ae")
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
     .replace(/Ä/g, "Ae")
     .replace(/Ö/g, "Oe")
-    .replace(/Ü/g, "Ue");
+    .replace(/Ü/g, "Ue")
+    // Skandinavische Umlauten/Sonderzeichen
+    .replace(/ø/g, "o")
+    .replace(/Ø/g, "O")
+    .replace(/å/g, "aa")
+    .replace(/Å/g, "Aa")
+    .replace(/æ/g, "ae")
+    .replace(/Æ/g, "Ae");
 }
 
 
@@ -210,4 +217,5 @@
   </script>
 </body>
 </html>
+
 
